@@ -42,10 +42,10 @@
 
 .notes-area {
     width: 100%;
-    min-height: 100px;
-    padding: 1rem;
+    min-height: 80px;
+    padding: 0.8rem 1.2rem;
     margin-top: 1rem;
-    border-radius: 10px;
+    border-radius: var(--radius-sm);
     border: 1px solid #ddd;
     font-family: inherit;
 }

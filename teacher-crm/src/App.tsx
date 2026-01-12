@@ -5,6 +5,7 @@ import StudentList from './components/StudentList'
 import ScheduleLesson from './components/ScheduleLesson'
 import LessonList from './components/LessonList'
 import StudentArea from './components/StudentArea'
+import Wallet from './components/Wallet'
 
 function App() {
   const [activeTab, setActiveTab] = useState<'daily' | 'folders' | 'student'>('daily');
@@ -42,6 +43,7 @@ function App() {
       <main className="app-main">
         {activeTab === 'daily' && (
           <div className="tab-content">
+            <Wallet />
             <div className="forms-section">
               <AddStudent />
               <ScheduleLesson />
