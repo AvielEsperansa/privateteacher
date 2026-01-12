@@ -1,0 +1,77 @@
+.student-portal-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    direction: rtl;
+}
+
+.student-welcome h1 {
+    color: #1a1a1a;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.student-welcome p {
+    color: #64748b;
+    margin-bottom: 30px;
+}
+
+.login-box {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.student-dashboard {
+    text-align: right;
+}
+
+.dashboard-card {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.dashboard-card h3 {
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #1a1a1a;
+}
+
+.material-link-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.download-btn {
+    background: #646cff;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.back-to-login {
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-top: 20px;
+}

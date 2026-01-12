@@ -1,0 +1,74 @@
+.student-profile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    direction: rtl;
+}
+
+.student-profile-card {
+    background: white;
+    width: 90%;
+    max-width: 800px;
+    height: 80vh;
+    border-radius: 20px;
+    padding: 2rem;
+    overflow-y: auto;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: #eee;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.profile-section {
+    margin-top: 2rem;
+    border-top: 1px solid #eee;
+    padding-top: 1.5rem;
+}
+
+.notes-area {
+    width: 100%;
+    min-height: 100px;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-family: inherit;
+}
+
+.history-item {
+    padding: 10px;
+    border-bottom: 1px solid #f9f9f9;
+    display: flex;
+    justify-content: space-between;
+}
+
+.material-item {
+    display: flex;
+    justify-content: space-between;
+    background: #f8fafc;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 8px;
+}
+
+.upload-section {
+    background: #f0f7ff;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-top: 1rem;
+}
