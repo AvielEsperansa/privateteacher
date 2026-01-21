@@ -1,0 +1,57 @@
+/* ===== 2026 Premium Add Student Form ===== */
+.add-student-container {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 35px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+}
+
+.add-student-container:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.add-student-container h2 {
+  font-size: 1.5rem;
+  margin-bottom: 25px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.student-form {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.credentials-section {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(14, 165, 233, 0.05) 100%);
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  margin: 20px 0;
+  border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+.credentials-section h4 {
+  margin: 0 0 15px 0;
+  font-size: 1rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

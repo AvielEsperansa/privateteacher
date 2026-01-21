@@ -1,0 +1,324 @@
+/* ===== 2026 Premium Student Area ===== */
+.student-area-dashboard {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    direction: rtl;
+}
+
+.student-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    padding: 35px;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 35px;
+    border: 1px solid var(--glass-border);
+}
+
+.welcome-text h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: var(--text-primary);
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.welcome-text p {
+    margin: 10px 0 0 0;
+    color: var(--text-secondary);
+}
+
+.back-to-login {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+    color: #dc2626;
+    border: 2px solid rgba(239, 68, 68, 0.2);
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 700;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.back-to-login:hover {
+    background: #dc2626;
+    color: white;
+    border-color: #dc2626;
+}
+
+/* Content Layout */
+.student-content-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 30px;
+}
+
+.student-section {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Sessions List */
+.sessions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.session-full-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--glass-border);
+    transition: all 0.3s ease;
+}
+
+.session-full-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.session-full-card.upcoming {
+    border-right: 5px solid var(--primary);
+}
+
+.session-full-card.history {
+    border-right: 5px solid #10b981;
+}
+
+.session-main-info {
+    padding: 20px 25px;
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, white 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+}
+
+.session-status-badge {
+    padding: 8px 18px;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.session-full-card.upcoming .session-status-badge {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+    color: var(--primary);
+}
+
+.session-full-card.history .session-status-badge {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%);
+    color: #059669;
+}
+
+.session-date-time {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.session-date-time .date {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1.05rem;
+}
+
+.session-date-time .time {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.session-details-grid {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.detail-item strong {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.detail-item p {
+    margin: 0;
+    line-height: 1.7;
+    color: var(--text-primary);
+    font-size: 1.05rem;
+}
+
+.detail-item.homework {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%);
+    padding: 18px;
+    border-radius: var(--radius-lg);
+    border-right: 4px solid #f59e0b;
+}
+
+.detail-item.materials {
+    border-top: 1px dashed var(--border);
+    padding-top: 18px;
+}
+
+.mats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.mini-mat-link {
+    text-decoration: none;
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.1);
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.mini-mat-link:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Sidebar Materials */
+.sidebar-materials {
+    position: sticky;
+    top: 120px;
+}
+
+.materials-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    padding: 25px;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--glass-border);
+}
+
+.general-mats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mat-item-link {
+    text-decoration: none;
+    color: var(--text-primary);
+    background: white;
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid var(--border);
+    display: block;
+}
+
+.mat-item-link:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateX(-5px);
+}
+
+/* No Data Card */
+.no-data-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    padding: 50px;
+    border-radius: var(--radius-xl);
+    text-align: center;
+    color: var(--text-muted);
+    border: 2px dashed var(--border);
+    font-size: 1.1rem;
+}
+
+/* Login Page */
+.student-login-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.student-login-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    padding: 50px 40px;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    max-width: 450px;
+    width: 100%;
+    text-align: center;
+    border: 1px solid var(--glass-border);
+    animation: slideUp 0.5s ease-out;
+}
+
+.student-login-card h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.student-login-card>p {
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+}
+
+.student-login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    text-align: right;
+}
+
+@media (max-width: 900px) {
+    .student-content-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar-materials {
+        order: -1;
+        position: relative;
+        top: 0;
+    }
+
+    .student-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+
+    .session-main-info {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .session-date-time {
+        align-items: center;
+    }
+}

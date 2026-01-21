@@ -1,0 +1,100 @@
+/* ===== 2026 Premium Student List ===== */
+.student-list-container {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 35px;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-md);
+}
+
+.student-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.student-list-header h2 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+/* Search Container */
+.search-container {
+    margin-bottom: 25px;
+}
+
+.search-container label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.search-input-wrapper {
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 1rem;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), var(--shadow-md);
+}
+
+/* Students Table */
+.students-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.students-table th {
+    text-align: right;
+    padding: 16px 20px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border);
+}
+
+.students-table td {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.students-table tr:hover td {
+    background: rgba(99, 102, 241, 0.03);
+}
+
+.students-table tr:last-child td {
+    border-bottom: none;
+}
+
+.no-students {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+}
