@@ -1,94 +1,100 @@
+/* ===== 2026 Premium Student List ===== */
 .student-list-container {
-    padding: 2rem;
-    max-width: 900px;
-    margin: 2rem auto;
-    background: #ffffff;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-    direction: rtl;
-    border: 1px solid #f0f0f0;
-}
-
-.search-container {
-    margin-bottom: 25px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    background: #f8fafc;
-    padding: 20px;
-    border-radius: 15px;
-    border: 1px solid #e2e8f0;
-}
-
-.search-container label {
-    font-weight: 700;
-    color: #2d3748;
-    margin-bottom: 5px;
-}
-
-.search-input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.search-input {
-    width: 100%;
-    padding: 12px 15px;
-    border-radius: 10px;
-    border: 2px solid #cbd5e0;
-    font-size: 1.1rem;
-    outline: none;
-    transition: all 0.2s;
-}
-
-.search-input:focus {
-    border-color: #646cff;
-    box-shadow: 0 0 0 3px rgba(100, 108, 255, 0.1);
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 35px;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-md);
 }
 
 .student-list-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
-    border-bottom: 2px solid #f0f0f0;
-    padding-bottom: 1rem;
+    margin-bottom: 25px;
 }
 
 .student-list-header h2 {
-    margin: 0;
-    color: #1a1a1a;
-    font-size: 1.8rem;
-    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--text-primary);
 }
 
+/* Search Container */
+.search-container {
+    margin-bottom: 25px;
+}
+
+.search-container label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.search-input-wrapper {
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 1rem;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), var(--shadow-md);
+}
+
+/* Students Table */
 .students-table {
     width: 100%;
-    border-collapse: collapse;
-}
-
-.students-table th,
-.students-table td {
-    padding: 15px;
-    text-align: right;
-    border-bottom: 1px solid #edf2f7;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
 }
 
 .students-table th {
-    background-color: #f8fafc;
-    color: #4a5568;
-    font-weight: 700;
-    font-size: 0.95rem;
+    text-align: right;
+    padding: 16px 20px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border);
 }
 
-.students-table tr:hover {
-    background-color: #f7fafc;
+.students-table td {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.students-table tr:hover td {
+    background: rgba(99, 102, 241, 0.03);
+}
+
+.students-table tr:last-child td {
+    border-bottom: none;
 }
 
 .no-students {
     text-align: center;
-    padding: 3rem;
-    color: #718096;
+    padding: 60px 20px;
+    color: var(--text-muted);
     font-size: 1.1rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
 }

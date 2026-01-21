@@ -2,26 +2,27 @@ import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import '../styles/StudentArea.css';
 
+interface Session {
+    id: string;
+    scheduled_at: string;
+    summary: string;
+    status: 'scheduled' | 'done' | 'canceled';
+    duration_minutes: number;
+    homework?: string;
+}
+
 interface Material {
     id: string;
     file_name: string;
     file_url: string;
-    lesson_id?: string;
-    created_at: string;
-}
-
-interface Lesson {
-    id: string;
-    lesson_date: string;
-    notes: string;
+    session_id?: string;
 }
 
 export default function StudentArea() {
-    const [studentName, setStudentName] = useState('');
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [studentData, setStudentData] = useState<any>(null);
+    const [loginData, setLoginData] = useState({ username: '', password: '' });
+    const [student, setStudent] = useState<any>(null);
+    const [sessions, setSessions] = useState<Session[]>([]);
     const [materials, setMaterials] = useState<Material[]>([]);
-    const [allLessons, setAllLessons] = useState<Lesson[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -31,34 +32,32 @@ export default function StudentArea() {
         setError('');
 
         try {
-            const { data: student, error: sError } = await supabase
+            const { data: s, error: sError } = await supabase
                 .from('students')
                 .select('*')
-                .ilike('full_name', `%${studentName}%`)
-                .single();
+                .eq('username', loginData.username.trim().toLowerCase())
+                .eq('password', loginData.password.trim())
+                .maybeSingle();
 
-            if (sError || !student) {
-                throw new Error('לא מצאנו תלמיד בשם הזה. ודא שהשם מדויק.');
+            if (sError || !s) {
+                throw new Error('שם המשתמש או הסיסמה אינם נכונים.');
             }
 
-            setStudentData(student);
+            setStudent(s);
 
-            const { data: mData } = await supabase
+            const { data: sess } = await supabase
+                .from('sessions')
+                .select('*')
+                .eq('student_id', s.id)
+                .order('scheduled_at', { ascending: false });
+
+            const { data: mats } = await supabase
                 .from('materials')
                 .select('*')
-                .eq('student_id', student.id)
-                .order('created_at', { ascending: false });
+                .eq('student_id', s.id);
 
-            setMaterials(mData || []);
-
-            const { data: lData } = await supabase
-                .from('lessons')
-                .select('*')
-                .eq('student_id', student.id)
-                .order('lesson_date', { ascending: false });
-
-            setAllLessons(lData || []);
-            setIsLoggedIn(true);
+            if (sess) setSessions(sess);
+            if (mats) setMaterials(mats);
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -66,104 +65,118 @@ export default function StudentArea() {
         }
     };
 
-    const now = new Date();
-    const futureLessons = allLessons.filter(l => new Date(l.lesson_date) > now).reverse();
-    const pastLessons = allLessons.filter(l => new Date(l.lesson_date) <= now);
+    if (student) {
+        const upcoming = sessions.filter(s => s.status === 'scheduled');
+        const history = sessions.filter(s => s.status === 'done');
+        const generalMaterials = materials.filter(m => !m.session_id);
 
-    if (!isLoggedIn) {
         return (
-            <div className="student-portal-container" style={{ maxWidth: '450px' }}>
-                <div className="student-welcome">
-                    <h1>שלום תלמיד! 👋</h1>
-                    <p>הכנס את שמך מלא כפי שמופיע אצל המורה</p>
+            <div className="student-area-dashboard">
+                <header className="student-header">
+                    <div className="welcome-text">
+                        <h1>שלום, {student.full_name}! 👋</h1>
+                        <p>כאן תמצאי את כל מה שאת צריכה ללימודים: שיעורים, סיכומים ודפי עבודה.</p>
+                    </div>
+                    <button onClick={() => setStudent(null)} className="back-to-login">יציאה מהחשבון</button>
+                </header>
+
+                <div className="student-content-layout">
+                    <div className="main-sessions">
+                        <section className="student-section">
+                            <h3 className="section-title">📅 השיעורים הקרובים שלי</h3>
+                            {upcoming.length === 0 ? (
+                                <div className="no-data-card">אין כרגע שיעורים עתידיים.</div>
+                            ) : (
+                                <div className="sessions-list">
+                                    {upcoming.map(s => (
+                                        <SessionItem key={s.id} s={s} mats={materials.filter(m => m.session_id === s.id)} type="upcoming" />
+                                    ))}
+                                </div>
+                            )}
+                        </section>
+
+                        <section className="student-section" style={{ marginTop: '40px' }}>
+                            <h3 className="section-title">📚 היסטוריית למידה וסיכומים</h3>
+                            {history.length === 0 ? (
+                                <div className="no-data-card">טרם בוצעו שיעורים.</div>
+                            ) : (
+                                <div className="sessions-list">
+                                    {history.map(s => (
+                                        <SessionItem key={s.id} s={s} mats={materials.filter(m => m.session_id === s.id)} type="history" />
+                                    ))}
+                                </div>
+                            )}
+                        </section>
+                    </div>
+
+                    <aside className="sidebar-materials">
+                        <section className="student-section">
+                            <h3 className="section-title">📂 דפי עבודה וחומרים כלליים</h3>
+                            <div className="materials-card">
+                                {generalMaterials.length === 0 ? <p style={{ color: '#a0aec0', fontSize: '0.9rem' }}>טרם הועלו חומרים כלליים.</p> : (
+                                    <div className="general-mats-list">
+                                        {generalMaterials.map(m => (
+                                            <a key={m.id} href={m.file_url} target="_blank" rel="noreferrer" className="mat-item-link">
+                                                📄 {m.file_name}
+                                            </a>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </section>
+                    </aside>
                 </div>
-                <form onSubmit={handleLogin} className="login-box">
-                    <input
-                        type="text"
-                        placeholder="שם מלא..."
-                        value={studentName}
-                        onChange={(e) => setStudentName(e.target.value)}
-                        className="input-field"
-                        style={{ textAlign: 'center', fontSize: '1.2rem' }}
-                        required
-                    />
-                    <button type="submit" disabled={loading} className="submit-button">כניסה לתיק האישי</button>
-                    {error && <p style={{ color: '#e74c3c', marginTop: '15px', fontWeight: 'bold' }}>{error}</p>}
-                </form>
             </div>
         );
     }
 
     return (
-        <div className="student-portal-container" style={{ maxWidth: '800px' }}>
-            <div className="student-dashboard">
-                <header style={{ textAlign: 'center', marginBottom: '40px' }}>
-                    <h2>היי {studentData.full_name.split(' ')[0]}, כיף שבאת! 🎓</h2>
-                    <p>הנה כל מה שאתה צריך לשיעורים שלנו</p>
-                </header>
+        <div className="student-login-container">
+            <div className="student-login-card">
+                <h2>🎓 כניסה לאזור התלמיד</h2>
+                <p>הזינו את פרטי הגישה שקיבלתם ממורן.</p>
+                <form onSubmit={handleLogin} className="student-login-form">
+                    <input type="text" placeholder="שם משתמש" value={loginData.username} onChange={e => setLoginData({ ...loginData, username: e.target.value })} required className="input-field" />
+                    <input type="password" placeholder="סיסמה" value={loginData.password} onChange={e => setLoginData({ ...loginData, password: e.target.value })} required className="input-field" />
+                    <button type="submit" disabled={loading} className="submit-button">{loading ? 'מתחבר...' : 'כניסה לפורטל'}</button>
+                    {error && <p className="status-message error">{error}</p>}
+                </form>
+            </div>
+        </div>
+    );
+}
 
-                {/* חלק 1: שיעורים קרובים - עכשיו כולל הצגת קבצים! */}
-                <section style={{ marginBottom: '40px' }}>
-                    <h3 style={{ borderRight: '4px solid #646cff', paddingRight: '15px', marginBottom: '20px' }}>📅 השיעורים הקרובים שלנו</h3>
-                    {futureLessons.length === 0 ? (
-                        <div className="dashboard-card"><p>אין כרגע שיעורים מתוכננים.</p></div>
-                    ) : (
-                        futureLessons.map(l => {
-                            const lessonMaterials = materials.filter(m => m.lesson_id === l.id);
-                            return (
-                                <div key={l.id} className="dashboard-card" style={{ borderRight: '8px solid #2ecc71' }}>
-                                    <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
-                                        {new Date(l.lesson_date).toLocaleString('he-IL', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}
-                                    </div>
-                                    {l.notes && <p style={{ color: '#4a5568', margin: '15px 0' }}>💡 <strong>הערה מהמורה:</strong> {l.notes}</p>}
-
-                                    {/* הצגת קבצים גם בשיעור עתידי */}
-                                    {lessonMaterials.length > 0 && (
-                                        <div style={{ marginTop: '15px', background: '#f0fff4', padding: '10px', borderRadius: '8px', border: '1px dashed #2ecc71' }}>
-                                            <p style={{ margin: '0 0 8px 0', fontSize: '0.85rem', fontWeight: 'bold' }}>📂 חומר להכנה / תרגול:</p>
-                                            {lessonMaterials.map(m => (
-                                                <div key={m.id} className="material-link-card" style={{ margin: '5px 0', padding: '8px', background: 'white' }}>
-                                                    <span style={{ fontSize: '0.85rem' }}>📄 {m.file_name}</span>
-                                                    <a href={m.file_url} target="_blank" rel="noreferrer" className="download-btn" style={{ padding: '4px 10px', fontSize: '0.75rem' }}>פתח</a>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })
-                    )}
-                </section>
-
-                {/* חלק 2: מה עשינו בשיעורים הקודמים */}
-                <section>
-                    <h3 style={{ borderRight: '4px solid #f6ad55', paddingRight: '15px', marginBottom: '20px' }}>📚 היסטוריית למידה ותרגול</h3>
-                    {pastLessons.map(l => {
-                        const lessonMaterials = materials.filter(m => m.lesson_id === l.id);
-                        return (
-                            <div key={l.id} className="dashboard-card">
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', borderBottom: '1px solid #f1f5f9' }}>
-                                    <span style={{ fontWeight: 'bold' }}>שיעור מיום {new Date(l.lesson_date).toLocaleDateString('he-IL')}</span>
-                                </div>
-                                <div style={{ marginBottom: '15px', lineHeight: '1.6' }}>
-                                    {l.notes || <span style={{ color: '#a0aec0' }}>אין סיכום לשיעור זה.</span>}
-                                </div>
-                                {lessonMaterials.length > 0 && (
-                                    <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '10px' }}>
-                                        {lessonMaterials.map(m => (
-                                            <div key={m.id} className="material-link-card" style={{ margin: '5px 0' }}>
-                                                <span>📄 {m.file_name}</span>
-                                                <a href={m.file_url} target="_blank" rel="noreferrer" className="download-btn">צפייה</a>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })}
-                </section>
-
-                <button onClick={() => setIsLoggedIn(false)} className="back-to-login" style={{ marginTop: '40px' }}>↩️ יציאה מהתיק האישי</button>
+function SessionItem({ s, mats, type }: { s: Session, mats: Material[], type: 'upcoming' | 'history' }) {
+    return (
+        <div className={`session-full-card ${type}`}>
+            <div className="session-main-info">
+                <div className="session-status-badge">{type === 'upcoming' ? 'שיעור קרוב' : 'היה שיעור מצוין'}</div>
+                <div className="session-date-time">
+                    <span className="date">{new Date(s.scheduled_at).toLocaleDateString('he-IL', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+                    <span className="time">{new Date(s.scheduled_at).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
+            </div>
+            <div className="session-details-grid">
+                <div className="detail-item">
+                    <strong>📝 {type === 'upcoming' ? 'מה נלמד במפגש:' : 'מה למדנו בשיעור:'}</strong>
+                    <p>{s.summary || 'אין סיכום עדיין.'}</p>
+                </div>
+                {s.homework && (
+                    <div className="detail-item homework">
+                        <strong>🏠 שיעורי בית:</strong>
+                        <p>{s.homework}</p>
+                    </div>
+                )}
+                {mats.length > 0 && (
+                    <div className="detail-item materials">
+                        <strong>📎 דפי עבודה מהשיעור:</strong>
+                        <div className="mats-row">
+                            {mats.map(m => (
+                                <a key={m.id} href={m.file_url} target="_blank" rel="noreferrer" className="mini-mat-link">📄 {m.file_name}</a>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -6,9 +6,9 @@ import StudentProfile from './StudentProfile';
 interface Student {
     id: string;
     full_name: string;
-    phone: string;
-    subject: string;
-    price_per_lesson: number;
+    email: string | null;
+    grade: string | null;
+    level: string | null;
     created_at: string;
 }
 
@@ -21,9 +21,13 @@ export default function StudentList() {
     const fetchStudents = async () => {
         setLoading(true);
         try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
             const { data, error } = await supabase
                 .from('students')
                 .select('*')
+                .eq('teacher_id', user.id)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -35,14 +39,26 @@ export default function StudentList() {
         }
     };
 
+    const handleDeleteStudent = async (id: string, name: string) => {
+        if (!window.confirm(`האם את בטוחה שברצונך למחוק את התלמיד/ה ${name}? כל השיעורים והקבצים שלו יימחקו גם כן.`)) return;
+
+        try {
+            const { error } = await supabase.from('students').delete().eq('id', id);
+            if (error) throw error;
+            fetchStudents();
+        } catch (err: any) {
+            alert('שגיאה במחיקה: ' + err.message);
+        }
+    };
+
     useEffect(() => {
         fetchStudents();
     }, []);
 
-    // סינון התלמידים לפי מה שהמורה מחפשת
     const filteredStudents = students.filter(student =>
         student.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (student.subject && student.subject.toLowerCase().includes(searchTerm.toLowerCase()))
+        (student.grade && student.grade.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (student.level && student.level.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     if (loading) return <div className="loading-spinner">טוען תיקי תלמידים...</div>;
@@ -57,11 +73,11 @@ export default function StudentList() {
             </div>
 
             <div className="search-container">
-                <label>🔍 חיפוש תלמיד או מקצוע:</label>
+                <label>🔍 חיפוש תלמיד, כיתה או רמה:</label>
                 <div className="search-input-wrapper">
                     <input
                         type="text"
-                        placeholder="חפשי לפי שם תלמיד, או מקצוע..."
+                        placeholder="חפשי לפי שם תלמיד, כיתה או רמה..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="search-input"
@@ -76,9 +92,9 @@ export default function StudentList() {
                     <thead>
                         <tr>
                             <th>שם מלא</th>
-                            <th>מקצוע</th>
-                            <th>טלפון</th>
-                            <th>סטטוס</th>
+                            <th>כיתה</th>
+                            <th>רמה</th>
+                            <th>אימייל</th>
                             <th>פעולות</th>
                         </tr>
                     </thead>
@@ -86,16 +102,23 @@ export default function StudentList() {
                         {filteredStudents.map((student) => (
                             <tr key={student.id}>
                                 <td style={{ fontWeight: 'bold' }}>{student.full_name}</td>
-                                <td>{student.subject || '-'}</td>
-                                <td>{student.phone || '-'}</td>
-                                <td><span style={{ color: '#2ecc71', fontSize: '0.8rem' }}>● פעיל</span></td>
-                                <td>
+                                <td>{student.grade || '-'}</td>
+                                <td>{student.level || '-'}</td>
+                                <td>{student.email || '-'}</td>
+                                <td style={{ display: 'flex', gap: '8px' }}>
                                     <button
                                         onClick={() => setSelectedStudentId(student.id)}
                                         className="refresh-button"
-                                        style={{ margin: 0, padding: '6px 12px', fontSize: '0.9rem', backgroundColor: '#646cff', color: 'white' }}
+                                        style={{ margin: 0, padding: '6px 12px', fontSize: '0.85rem', backgroundColor: '#646cff', color: 'white' }}
                                     >
-                                        📂 פתח תיק
+                                        📂 פתח
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteStudent(student.id, student.full_name)}
+                                        className="refresh-button"
+                                        style={{ margin: 0, padding: '6px 12px', fontSize: '0.85rem', backgroundColor: '#fed7d7', color: '#c53030', border: 'none' }}
+                                    >
+                                        🗑️ מחק
                                     </button>
                                 </td>
                             </tr>
@@ -107,7 +130,7 @@ export default function StudentList() {
             {selectedStudentId && (
                 <StudentProfile
                     studentId={selectedStudentId}
-                    onClose={() => setSelectedStudentId(null)}
+                    onClose={() => { setSelectedStudentId(null); fetchStudents(); }}
                 />
             )}
         </div>
