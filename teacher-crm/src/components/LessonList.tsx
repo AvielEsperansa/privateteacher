@@ -141,14 +141,9 @@ export default function LessonList() {
                 return;
             }
 
-            const toLocalISO = (date: Date) => {
-                const pad = (num: number) => String(num).padStart(2, '0');
-                return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-            };
-
             const { error } = await supabase
                 .from('sessions')
-                .update({ scheduled_at: toLocalISO(newStart) })
+                .update({ scheduled_at: newStart.toISOString() })
                 .eq('id', sessionId);
 
             if (error) throw error;
@@ -194,15 +189,10 @@ export default function LessonList() {
                 return;
             }
 
-            const toLocalISO = (date: Date) => {
-                const pad = (num: number) => String(num).padStart(2, '0');
-                return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-            };
-
             const { error } = await supabase
                 .from('sessions')
                 .update({
-                    scheduled_at: toLocalISO(newStart),
+                    scheduled_at: newStart.toISOString(),
                     duration_minutes: newDuration
                 })
                 .eq('id', sessionId);
@@ -266,8 +256,8 @@ export default function LessonList() {
                 height="auto"
                 locale="he"
                 direction="rtl"
-                slotMinTime="08:00:00"
-                slotMaxTime="21:00:00"
+                slotMinTime="07:00:00"
+                slotMaxTime="23:00:00"
                 allDaySlot={false}
                 nowIndicator={true}
                 eventTimeFormat={{

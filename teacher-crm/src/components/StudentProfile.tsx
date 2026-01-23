@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { X, Settings, Phone, GraduationCap, CheckCircle, Clock, MessageCircle, Save, Edit3, Shield } from 'lucide-react';
 import '../styles/StudentProfile.css';
 
 interface Student {
@@ -13,6 +14,7 @@ interface Student {
     subject?: string;
     username?: string;
     password?: string;
+    hourly_rate?: number;
 }
 
 interface Session {
@@ -25,23 +27,19 @@ interface Session {
     is_paid: boolean;
 }
 
-
 interface Props {
     studentId: string;
-    selectedLessonId?: string;
     onClose: () => void;
 }
 
 export default function StudentProfile({ studentId, onClose }: Props) {
     const [student, setStudent] = useState<Student | null>(null);
     const [sessions, setSessions] = useState<Session[]>([]);
+    const [activeTab, setActiveTab] = useState<'sessions' | 'notes'>('sessions');
     const [newNote, setNewNote] = useState('');
     const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
     const [isEditingStudent, setIsEditingStudent] = useState(false);
-
-    // טופס עריכת תלמיד
     const [studentForm, setStudentForm] = useState<Partial<Student>>({});
-
     const [editForm, setEditForm] = useState({
         scheduled_at: '',
         duration_minutes: 60,
@@ -49,7 +47,7 @@ export default function StudentProfile({ studentId, onClose }: Props) {
         homework: ''
     });
 
-    const sessionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
 
     useEffect(() => {
         fetchProfileData();
@@ -78,14 +76,14 @@ export default function StudentProfile({ studentId, onClose }: Props) {
                 grade: studentForm.grade,
                 subject: studentForm.subject,
                 username: studentForm.username,
-                password: studentForm.password
+                password: studentForm.password,
+                hourly_rate: studentForm.hourly_rate
             })
             .eq('id', studentId);
 
         if (!error) {
             setIsEditingStudent(false);
             fetchProfileData();
-            alert('פרטי התלמיד עודכנו בהצלחה!');
         }
     };
 
@@ -112,13 +110,12 @@ export default function StudentProfile({ studentId, onClose }: Props) {
 
             if (conflict) {
                 const conflictTime = new Date(conflict.scheduled_at).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
-                // Note: 'students' in the query returns a single object if configured correctly in Supabase/PostgREST
                 const studentName = (conflict.students as any)?.full_name || 'תלמיד אחר';
                 throw new Error(`חפיפת זמנים! כבר קיים שיעור בשעה ${conflictTime} עם ${studentName}`);
             }
 
             await supabase.from('sessions').update({
-                scheduled_at: editForm.scheduled_at,
+                scheduled_at: startTime.toISOString(),
                 duration_minutes: editForm.duration_minutes,
                 summary: editForm.summary,
                 homework: editForm.homework
@@ -129,15 +126,11 @@ export default function StudentProfile({ studentId, onClose }: Props) {
         } catch (err: any) { alert(err.message); }
     };
 
-    const toggleStatus = async (sessionId: string, currentStatus: string) => {
-        const nextStatus = currentStatus === 'scheduled' ? 'done' : 'scheduled';
-        await supabase.from('sessions').update({ status: nextStatus }).eq('id', sessionId);
-        fetchProfileData();
-    };
+
 
     const togglePaidStatus = async (sessionId: string, currentPaid: boolean) => {
-        await supabase.from('sessions').update({ is_paid: !currentPaid }).eq('id', sessionId);
-        fetchProfileData();
+        const { error } = await supabase.from('sessions').update({ is_paid: !currentPaid }).eq('id', sessionId);
+        if (!error) fetchProfileData();
     };
 
     const sendWhatsAppSummary = (session: Session) => {
@@ -154,134 +147,195 @@ export default function StudentProfile({ studentId, onClose }: Props) {
 
         const phone = student.phone_number.replace(/[^0-9]/g, '');
         const finalPhone = phone.startsWith('0') ? '972' + phone.substring(1) : phone;
-
         window.open(`https://wa.me/${finalPhone}?text=${text}`, '_blank');
     };
 
     if (!student) return null;
 
+    const initials = student.full_name.split(' ').map(n => n[0]).join('').toUpperCase();
+
     return (
         <div className="student-profile-overlay">
             <div className="student-profile-card">
-                <button onClick={onClose} className="close-btn">סגור X</button>
-
-                {isEditingStudent ? (
-                    <div className="student-edit-form-container">
-                        <h2>⚙️ עריכת פרטי תלמיד</h2>
-                        <form onSubmit={handleUpdateStudent} className="student-personal-edit-form">
-                            <div className="form-row">
-                                <input type="text" placeholder="שם מלא" value={studentForm.full_name} onChange={e => setStudentForm({ ...studentForm, full_name: e.target.value })} required />
-                                <input type="text" placeholder="טלפון" value={studentForm.phone_number} onChange={e => setStudentForm({ ...studentForm, phone_number: e.target.value })} />
-                            </div>
-                            <div className="form-row">
-                                <input type="text" placeholder="כיתה" value={studentForm.grade} onChange={e => setStudentForm({ ...studentForm, grade: e.target.value })} />
-                                <select value={studentForm.subject} onChange={e => setStudentForm({ ...studentForm, subject: e.target.value })}>
-                                    <option value="מתמטיקה">מתמטיקה</option>
-                                    <option value="אנגלית">אנגלית</option>
-                                    <option value="לשון">לשון</option>
-                                    <option value="מדעים">מדעים</option>
-                                    <option value="אחר">אחר</option>
-                                </select>
-                            </div>
-                            <div className="credentials-edit">
-                                <h4>🔐 פרטי גישה לאזור האישי</h4>
-                                <div className="form-row">
-                                    <input type="text" placeholder="שם משתמש" value={studentForm.username} onChange={e => setStudentForm({ ...studentForm, username: e.target.value })} />
-                                    <input type="text" placeholder="סיסמה" value={studentForm.password} onChange={e => setStudentForm({ ...studentForm, password: e.target.value })} />
-                                </div>
-                            </div>
-                            <div className="form-actions" style={{ marginTop: '20px' }}>
-                                <button type="submit" className="save-btn">שמור שינויים</button>
-                                <button type="button" onClick={() => setIsEditingStudent(false)} className="cancel-btn">ביטול</button>
-                            </div>
-                        </form>
+                <div className="profile-modal-header">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <GraduationCap size={24} className="text-primary" />
+                        <h2 style={{ fontSize: '1.25rem' }}>תיק תלמיד</h2>
                     </div>
-                ) : (
-                    <>
-                        <div className="profile-header">
-                            <div className="student-main-info">
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <h1>{student.full_name}</h1>
-                                    <button onClick={() => setIsEditingStudent(true)} className="edit-personal-btn">⚙️ עריכת פרטים</button>
-                                </div>
-                                <div className="tags">
-                                    <span className="tag subject">{student.subject || 'כללי'}</span>
-                                    <span className="tag grade">{student.grade || 'ללא כיתה'}</span>
-                                    <span className="tag phone">📱 {student.phone_number || 'אין טלפון'}</span>
-                                </div>
-                            </div>
-                        </div>
+                    <button onClick={onClose} className="btn btn-secondary" style={{ padding: '0.5rem' }}>
+                        <X size={20} />
+                    </button>
+                </div>
 
-                        <div className="profile-grid">
-                            <div className="profile-main-content">
-                                <section className="profile-section">
-                                    <h3>🕒 יומן למידה וסיכומי שיעורים</h3>
-                                    <div className="profile-sessions-list">
-                                        {sessions.map(s => {
+                <div className="profile-modal-body">
+                    {isEditingStudent ? (
+                        <div className="animate-fade-in">
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
+                                <h3>עריכת פרטים אישיים</h3>
+                                <button onClick={() => setIsEditingStudent(false)} className="btn btn-secondary">ביטול</button>
+                            </div>
+                            <form onSubmit={handleUpdateStudent} className="form-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                                <div className="form-group">
+                                    <label className="form-label">שם מלא</label>
+                                    <input type="text" className="input" value={studentForm.full_name} onChange={e => setStudentForm({ ...studentForm, full_name: e.target.value })} required />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">טלפון</label>
+                                    <input type="text" className="input" value={studentForm.phone_number} onChange={e => setStudentForm({ ...studentForm, phone_number: e.target.value })} />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">כיתה</label>
+                                    <input type="text" className="input" value={studentForm.grade} onChange={e => setStudentForm({ ...studentForm, grade: e.target.value })} />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">מקצוע</label>
+                                    <select className="input" value={studentForm.subject} onChange={e => setStudentForm({ ...studentForm, subject: e.target.value })}>
+                                        <option value="מתמטיקה">מתמטיקה</option>
+                                        <option value="אנגלית">אנגלית</option>
+                                        <option value="לשון">לשון</option>
+                                        <option value="מדעים">מדעים</option>
+                                        <option value="אחר">אחר</option>
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">מחיר לשעה (₪)</label>
+                                    <input type="number" className="input" value={studentForm.hourly_rate} onChange={e => setStudentForm({ ...studentForm, hourly_rate: parseInt(e.target.value) })} />
+                                </div>
+                                <div className="credentials-section" style={{ gridColumn: '1 / -1' }}>
+                                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                                        <Shield size={18} />
+                                        פרטי גישה לתלמיד
+                                    </h4>
+                                    <div className="form-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                                        <input type="text" className="input" placeholder="שם משתמש" value={studentForm.username} onChange={e => setStudentForm({ ...studentForm, username: e.target.value })} />
+                                        <input type="text" className="input" placeholder="סיסמה" value={studentForm.password} onChange={e => setStudentForm({ ...studentForm, password: e.target.value })} />
+                                    </div>
+                                </div>
+                                <button type="submit" className="btn btn-primary" style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
+                                    <Save size={18} />
+                                    שמור שינויים בתיק
+                                </button>
+                            </form>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="profile-summary-bar">
+                                <div className="profile-avatar-circle">{initials}</div>
+                                <div className="profile-main-meta">
+                                    <h1>{student.full_name}</h1>
+                                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                                        <span className="badge badge-info">{student.subject || 'כללי'}</span>
+                                        <span className="badge badge-success">כיתה {student.grade || 'ללא'}</span>
+                                        {student.phone_number && (
+                                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                                                <Phone size={14} /> {student.phone_number}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                <button onClick={() => setIsEditingStudent(true)} className="btn btn-secondary" style={{ marginRight: 'auto' }}>
+                                    <Settings size={18} />
+                                    הגדרות
+                                </button>
+                            </div>
+
+                            <div className="profile-tabs">
+                                <button className={`profile-tab-btn ${activeTab === 'sessions' ? 'active' : ''}`} onClick={() => setActiveTab('sessions')}>שיעורים וסיכומים</button>
+                                <button className={`profile-tab-btn ${activeTab === 'notes' ? 'active' : ''}`} onClick={() => setActiveTab('notes')}>הערות למידה</button>
+                            </div>
+
+                            {activeTab === 'sessions' ? (
+                                <div className="animate-fade-in">
+                                    {sessions.length === 0 ? (
+                                        <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+                                            <Clock size={48} style={{ margin: '0 auto 1rem', display: 'block' }} />
+                                            <p>טרם נקבעו שיעורים לתלמיד זה.</p>
+                                        </div>
+                                    ) : (
+                                        sessions.map(s => {
                                             const isEditing = editingSessionId === s.id;
                                             return (
-                                                <div key={s.id} className={`profile-session-item ${s.status}`} ref={el => { sessionRefs.current[s.id] = el; }}>
+                                                <div key={s.id} className="session-card-mini">
                                                     {isEditing ? (
-                                                        <div className="full-edit-mode">
-                                                            <div className="edit-grid">
-                                                                <input type="datetime-local" value={editForm.scheduled_at.slice(0, 16)} onChange={e => setEditForm({ ...editForm, scheduled_at: e.target.value })} />
-                                                                <input type="number" value={editForm.duration_minutes} onChange={e => setEditForm({ ...editForm, duration_minutes: parseInt(e.target.value) })} />
+                                                        <div style={{ width: '100%' }}>
+                                                            <div className="form-grid" style={{ gridTemplateColumns: '1fr 1fr', marginBottom: '1rem' }}>
+                                                                <input type="datetime-local" className="input" value={editForm.scheduled_at.slice(0, 16)} onChange={e => setEditForm({ ...editForm, scheduled_at: e.target.value })} />
+                                                                <input type="number" className="input" placeholder="דקות" value={editForm.duration_minutes} onChange={e => setEditForm({ ...editForm, duration_minutes: parseInt(e.target.value) })} />
                                                             </div>
-                                                            <textarea value={editForm.summary} onChange={e => setEditForm({ ...editForm, summary: e.target.value })} />
-                                                            <textarea value={editForm.homework} onChange={e => setEditForm({ ...editForm, homework: e.target.value })} />
-                                                            <div className="edit-actions">
-                                                                <button onClick={() => handleSaveSessionEdit(s.id)} className="save-btn">שמור</button>
-                                                                <button onClick={() => setEditingSessionId(null)} className="cancel-btn">ביטול</button>
+                                                            <textarea className="input" style={{ marginBottom: '1rem', minHeight: '100px' }} placeholder="סיכום שיעור..." value={editForm.summary} onChange={e => setEditForm({ ...editForm, summary: e.target.value })} />
+                                                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                                                <button onClick={() => handleSaveSessionEdit(s.id)} className="btn btn-primary">שמור</button>
+                                                                <button onClick={() => setEditingSessionId(null)} className="btn btn-secondary">ביטול</button>
                                                             </div>
                                                         </div>
                                                     ) : (
                                                         <>
-                                                            <div className="session-item-header">
-                                                                <span className="session-date">
-                                                                    📅 {new Date(s.scheduled_at).toLocaleDateString('he-IL', { weekday: 'short', day: 'numeric', month: 'numeric' })}
-                                                                    <span style={{ marginRight: '10px', fontWeight: 'bold', color: 'var(--primary)' }}>
-                                                                        ⏰ {new Date(s.scheduled_at).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
+                                                            <div style={{ flex: 1 }}>
+                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+                                                                    <span style={{ fontWeight: 700 }}>
+                                                                        {new Date(s.scheduled_at).toLocaleDateString('he-IL', { day: 'numeric', month: 'short' })}
                                                                     </span>
-                                                                </span>
-                                                                <div style={{ display: 'flex', gap: '8px' }}>
-                                                                    <button onClick={() => sendWhatsAppSummary(s)} className="status-badge-mini" style={{ background: '#25d366', color: 'white' }}>🟢 WA</button>
-                                                                    <button onClick={() => togglePaidStatus(s.id, s.is_paid)} className={`status-badge-mini ${s.is_paid ? 'done' : 'scheduled'}`} style={!s.is_paid ? { background: '#fef3c7', color: '#b45309' } : {}}>
-                                                                        {s.is_paid ? '💰 שולם' : '💳 חוב'}
-                                                                    </button>
-                                                                    <button onClick={() => toggleStatus(s.id, s.status)} className={`status-badge-mini ${s.status}`}>{s.status === 'done' ? '✅ בוצע' : '⏳ מתוכנן'}</button>
+                                                                    <span className="text-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                                        <Clock size={14} /> {new Date(s.scheduled_at).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
+                                                                    </span>
+                                                                    <span className={`badge ${s.status === 'done' ? 'badge-success' : 'badge-info'}`}>
+                                                                        {s.status === 'done' ? 'בוצע' : 'מתוכנן'}
+                                                                    </span>
                                                                 </div>
+                                                                <p className="text-secondary" style={{ fontSize: '0.9375rem' }}>{s.summary || 'לחצי להוספת סיכום שיעור...'}</p>
                                                             </div>
-                                                            <div className="view-box" onClick={() => {
-                                                                setEditingSessionId(s.id);
-                                                                setEditForm({
-                                                                    scheduled_at: new Date(new Date(s.scheduled_at).getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 16),
-                                                                    duration_minutes: s.duration_minutes,
-                                                                    summary: s.summary || '',
-                                                                    homework: s.homework || ''
-                                                                });
-                                                            }}>
-                                                                <p className="summary-text">{s.summary || 'לחצי לעריכה...'}</p>
+                                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                                <button onClick={() => sendWhatsAppSummary(s)} className="btn btn-secondary" style={{ color: '#25d366', padding: '0.5rem' }} title="שלח סיכום בוואטסאפ">
+                                                                    <MessageCircle size={18} />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => togglePaidStatus(s.id, s.is_paid)}
+                                                                    className={`payment-status-btn ${s.is_paid ? 'paid' : 'unpaid'}`}
+                                                                    title={s.is_paid ? 'סומן כשולם' : 'סמן כשיעור שבוצע אך טרם שולם'}
+                                                                >
+                                                                    {s.is_paid ? <CheckCircle size={16} /> : <Clock size={16} />}
+                                                                    <span>{s.is_paid ? 'שולם' : 'טרם שולם'}</span>
+                                                                </button>
+                                                                <button onClick={() => {
+                                                                    setEditingSessionId(s.id);
+                                                                    setEditForm({
+                                                                        scheduled_at: new Date(new Date(s.scheduled_at).getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 16),
+                                                                        duration_minutes: s.duration_minutes,
+                                                                        summary: s.summary || '',
+                                                                        homework: s.homework || ''
+                                                                    });
+                                                                }} className="btn btn-secondary" style={{ padding: '0.5rem' }}>
+                                                                    <Edit3 size={18} />
+                                                                </button>
                                                             </div>
                                                         </>
                                                     )}
                                                 </div>
                                             );
-                                        })}
+                                        })
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="animate-fade-in">
+                                    <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                        <h3>הערות למידה ודגשים</h3>
+                                        <button onClick={async () => { await supabase.from('students').update({ notes: newNote }).eq('id', studentId); fetchProfileData(); }} className="btn btn-primary">
+                                            <Save size={16} /> שמור הערות
+                                        </button>
                                     </div>
-                                </section>
-                            </div>
-
-                            <div className="profile-sidebar">
-                                <section className="profile-section">
-                                    <h3>✍️ הערות כלליות</h3>
-                                    <textarea className="notes-area-large" value={newNote} onChange={e => setNewNote(e.target.value)} placeholder="מידע חשוב..." />
-                                    <button onClick={async () => { await supabase.from('students').update({ notes: newNote }).eq('id', studentId); alert('הערות נשמרו'); }} className="submit-button">שמור הערות</button>
-                                </section>
-                            </div>
-                        </div>
-                    </>
-                )}
+                                    <textarea
+                                        className="notes-editor"
+                                        value={newNote}
+                                        onChange={e => setNewNote(e.target.value)}
+                                        placeholder="הוסיפי הערות על התקדמות התלמיד, קשיים, חוזקות וכל מה שחשוב לזכור..."
+                                    />
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );
 }
+

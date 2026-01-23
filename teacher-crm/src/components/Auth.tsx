@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { GraduationCap, Mail, Lock, User, LogIn, UserPlus as UserPlusIcon } from 'lucide-react';
 import '../styles/Auth.css';
 
 export default function Auth() {
@@ -85,11 +86,14 @@ export default function Auth() {
     };
 
     return (
-        <div className="auth-container">
+        <div className="auth-wrapper">
             <div className="auth-card">
                 <div className="auth-header">
-                    <h1>🎓 מערכת ניהול תלמידים</h1>
-                    <p>{isLogin ? 'התחברות למורים' : 'הרשמה למורה חדש'}</p>
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+                        <GraduationCap size={48} color="#4f46e5" />
+                    </div>
+                    <h1>מורהפרטי</h1>
+                    <p>{isLogin ? 'ברוכים השבים! התחברו כדי לנהל את השיעורים שלכם.' : 'הצטרפו לקהילת המורים הפרטיים שלנו.'}</p>
                 </div>
 
                 <div className="auth-tabs">
@@ -100,6 +104,7 @@ export default function Auth() {
                             setMessage('');
                         }}
                     >
+                        <LogIn size={16} style={{ marginLeft: '6px', verticalAlign: 'middle' }} />
                         התחברות
                     </button>
                     <button
@@ -109,65 +114,68 @@ export default function Auth() {
                             setMessage('');
                         }}
                     >
+                        <UserPlusIcon size={16} style={{ marginLeft: '6px', verticalAlign: 'middle' }} />
                         הרשמה
                     </button>
                 </div>
 
                 <form onSubmit={isLogin ? handleLogin : handleSignup} className="auth-form">
                     {!isLogin && (
-                        <div className="input-group">
-                            <label>שם מלא:</label>
-                            <input
-                                type="text"
-                                required
-                                placeholder="שם המורה"
-                                value={formData.fullName}
-                                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                                className="input-field"
-                            />
+                        <div className="form-group">
+                            <label className="form-label">שם מלא:</label>
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type="text"
+                                    required
+                                    placeholder="שם המורה"
+                                    value={formData.fullName}
+                                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                                    className="input"
+                                />
+                            </div>
                         </div>
                     )}
 
-                    <div className="input-group">
-                        <label>אימייל:</label>
+                    <div className="form-group">
+                        <label className="form-label">אימייל:</label>
                         <input
                             type="email"
                             required
                             placeholder="teacher@example.com"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            className="input-field"
+                            className="input"
                         />
                     </div>
 
-                    <div className="input-group">
-                        <label>סיסמה:</label>
+                    <div className="form-group">
+                        <label className="form-label">סיסמה:</label>
                         <input
                             type="password"
                             required
                             placeholder="לפחות 6 תווים"
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                            className="input-field"
+                            className="input"
                         />
                     </div>
 
                     {!isLogin && (
-                        <div className="input-group">
-                            <label>אימות סיסמה:</label>
+                        <div className="form-group">
+                            <label className="form-label">אימות סיסמה:</label>
                             <input
                                 type="password"
                                 required
                                 placeholder="הקלד את הסיסמה שוב"
                                 value={formData.confirmPassword}
                                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                                className="input-field"
+                                className="input"
                             />
                         </div>
                     )}
 
-                    <button type="submit" disabled={loading} className="submit-button">
-                        {loading ? 'מעבד...' : (isLogin ? 'התחבר' : 'הירשם')}
+                    <button type="submit" disabled={loading} className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
+                        {loading ? 'מעבד...' : (isLogin ? 'התחבר למערכת' : 'צור חשבון חדש')}
                     </button>
 
                     {message && (
@@ -178,11 +186,10 @@ export default function Auth() {
                 </form>
 
                 <div className="auth-footer">
-                    <p style={{ fontSize: '0.85rem', color: '#718096', marginTop: '20px' }}>
-                        🔒 הסיסמאות מוצפנות ומאובטחות
-                    </p>
+                    <p>🔒 כל הנתונים שלכם מאובטחים ומוצפנים מקצה לקצה.</p>
                 </div>
             </div>
         </div>
     );
 }
+
