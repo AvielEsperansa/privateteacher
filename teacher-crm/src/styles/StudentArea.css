@@ -1,324 +1,126 @@
-/* ===== 2026 Premium Student Area ===== */
+/* ===== 2026 Professional Student Portal Styles ===== */
 .student-area-dashboard {
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 30px 20px;
-    direction: rtl;
 }
 
-.student-header {
+.student-portal-header {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+    padding: 2.5rem;
+    margin-bottom: 2.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    padding: 35px;
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-md);
-    margin-bottom: 35px;
-    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-sm);
 }
 
-.welcome-text h1 {
-    margin: 0;
+.student-welcome h1 {
     font-size: 2rem;
-    color: var(--text-primary);
-    background: var(--gradient-hero);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
 }
 
-.welcome-text p {
-    margin: 10px 0 0 0;
-    color: var(--text-secondary);
-}
-
-.back-to-login {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
-    color: #dc2626;
-    border: 2px solid rgba(239, 68, 68, 0.2);
-    padding: 12px 24px;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-weight: 700;
-    font-family: inherit;
-    transition: all 0.3s ease;
-}
-
-.back-to-login:hover {
-    background: #dc2626;
-    color: white;
-    border-color: #dc2626;
-}
-
-/* Content Layout */
-.student-content-layout {
+.student-layout {
     display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 30px;
+    grid-template-columns: 1fr 340px;
+    gap: 2.5rem;
 }
 
-.student-section {
-    margin-bottom: 30px;
-}
-
-.section-title {
-    font-size: 1.3rem;
-    margin-bottom: 20px;
-    color: var(--text-primary);
+.portal-section-title {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 0.75rem;
 }
 
-/* Sessions List */
-.sessions-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.session-full-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
+.session-portal-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius-xl);
     overflow: hidden;
+    margin-bottom: 1.5rem;
+    transition: all 0.2s ease;
+}
+
+.session-portal-card:hover {
     box-shadow: var(--shadow-md);
-    border: 1px solid var(--glass-border);
-    transition: all 0.3s ease;
+    border-color: var(--primary);
 }
 
-.session-full-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
-}
-
-.session-full-card.upcoming {
-    border-right: 5px solid var(--primary);
-}
-
-.session-full-card.history {
-    border-right: 5px solid #10b981;
-}
-
-.session-main-info {
-    padding: 20px 25px;
-    background: linear-gradient(135deg, var(--bg-secondary) 0%, white 100%);
+.portal-session-header {
+    padding: 1.25rem 1.5rem;
+    background: var(--bg-main);
+    border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--border);
 }
 
-.session-status-badge {
-    padding: 8px 18px;
-    border-radius: 25px;
-    font-size: 0.85rem;
-    font-weight: 700;
+.portal-session-body {
+    padding: 1.5rem;
 }
 
-.session-full-card.upcoming .session-status-badge {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
-    color: var(--primary);
-}
-
-.session-full-card.history .session-status-badge {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%);
-    color: #059669;
-}
-
-.session-date-time {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
-.session-date-time .date {
-    font-weight: 700;
-    color: var(--text-primary);
-    font-size: 1.05rem;
-}
-
-.session-date-time .time {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-}
-
-.session-details-grid {
-    padding: 25px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-}
-
-.detail-item strong {
-    display: block;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-
-.detail-item p {
-    margin: 0;
-    line-height: 1.7;
-    color: var(--text-primary);
-    font-size: 1.05rem;
-}
-
-.detail-item.homework {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%);
-    padding: 18px;
+.homework-box {
+    background: var(--warning-light);
+    border: 1px solid var(--warning);
+    padding: 1.25rem;
     border-radius: var(--radius-lg);
-    border-right: 4px solid #f59e0b;
+    margin-top: 1rem;
+    color: var(--warning-dark);
 }
 
-.detail-item.materials {
-    border-top: 1px dashed var(--border);
-    padding-top: 18px;
-}
-
-.mats-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.mini-mat-link {
+.material-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--bg-main);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    font-size: 0.8125rem;
+    color: var(--text-main);
     text-decoration: none;
-    color: var(--primary);
-    background: rgba(99, 102, 241, 0.1);
-    padding: 8px 14px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
-.mini-mat-link:hover {
-    background: var(--primary);
-    color: white;
-    transform: scale(1.05);
-}
-
-/* Sidebar Materials */
-.sidebar-materials {
-    position: sticky;
-    top: 120px;
-}
-
-.materials-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    padding: 25px;
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--glass-border);
-}
-
-.general-mats-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.mat-item-link {
-    text-decoration: none;
-    color: var(--text-primary);
-    background: white;
-    padding: 14px 18px;
-    border-radius: var(--radius-md);
-    font-size: 0.95rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    border: 2px solid var(--border);
-    display: block;
-}
-
-.mat-item-link:hover {
-    background: var(--primary);
-    color: white;
+.material-chip:hover {
+    background: var(--primary-light);
     border-color: var(--primary);
-    transform: translateX(-5px);
+    color: var(--primary);
 }
 
-/* No Data Card */
-.no-data-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    padding: 50px;
-    border-radius: var(--radius-xl);
-    text-align: center;
-    color: var(--text-muted);
-    border: 2px dashed var(--border);
-    font-size: 1.1rem;
+.portal-sidebar-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+    padding: 2rem;
+    position: sticky;
+    top: 2rem;
 }
 
-/* Login Page */
-.student-login-container {
+.student-login-wrap {
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 40px 20px;
+    padding: 2rem;
 }
 
 .student-login-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    padding: 50px 40px;
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
-    max-width: 450px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+    padding: 3rem;
     width: 100%;
+    max-width: 440px;
+    box-shadow: var(--shadow-xl);
     text-align: center;
-    border: 1px solid var(--glass-border);
-    animation: slideUp 0.5s ease-out;
-}
-
-.student-login-card h2 {
-    font-size: 1.8rem;
-    margin-bottom: 10px;
-    color: var(--text-primary);
-}
-
-.student-login-card>p {
-    color: var(--text-secondary);
-    margin-bottom: 30px;
-}
-
-.student-login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    text-align: right;
 }
 
 @media (max-width: 900px) {
-    .student-content-layout {
+    .student-layout {
         grid-template-columns: 1fr;
-    }
-
-    .sidebar-materials {
-        order: -1;
-        position: relative;
-        top: 0;
-    }
-
-    .student-header {
-        flex-direction: column;
-        text-align: center;
-        gap: 20px;
-    }
-
-    .session-main-info {
-        flex-direction: column;
-        text-align: center;
-        gap: 15px;
-    }
-
-    .session-date-time {
-        align-items: center;
     }
 }
