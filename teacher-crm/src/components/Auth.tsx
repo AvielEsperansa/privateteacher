@@ -59,6 +59,18 @@ export default function Auth() {
         }
 
         try {
+            // בדיקה אם המייל כבר רשום בטבלת המורים באמצעות פונקציה מאובטחת
+            const { data: emailExists, error: checkError } = await supabase
+                .rpc('check_teacher_email_exists', { email_to_check: cleanEmail });
+
+            if (checkError) throw checkError;
+
+            if (emailExists) {
+                setMessage('שגיאה: האימייל הזה כבר רשום במערכת');
+                setLoading(false);
+                return;
+            }
+
             const { data: authData, error: authError } = await supabase.auth.signUp({
                 email: cleanEmail,
                 password: cleanPassword,

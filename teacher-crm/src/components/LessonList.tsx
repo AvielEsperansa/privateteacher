@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { RefreshCw } from 'lucide-react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -86,21 +87,25 @@ export default function LessonList() {
         const startTime = new Date(session.scheduled_at).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
         const endTime = new Date(new Date(session.scheduled_at).getTime() + session.duration_minutes * 60000).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
 
+        const studentName = session.students?.full_name || 'תלמיד לא ידוע';
+        const studentSubject = session.students?.subject || 'כללי';
+        const studentPhone = session.students?.phone_number || '';
+
         return {
             id: session.id,
-            title: `${session.students.full_name} (${startTime}-${endTime})`,
+            title: `${studentName} (${startTime}-${endTime})`,
             start: start.toISOString(),
             end: end.toISOString(),
             backgroundColor,
             borderColor,
             extendedProps: {
                 student_id: session.student_id,
-                subject: session.students.subject,
+                subject: studentSubject,
                 status: session.status,
                 is_paid: session.is_paid,
                 summary: session.summary,
                 homework: session.homework,
-                phone: session.students.phone_number,
+                phone: studentPhone,
                 duration_minutes: session.duration_minutes
             }
         };
@@ -212,7 +217,10 @@ export default function LessonList() {
         <div className="calendar-container">
             <div className="calendar-header">
                 <h2>📅 לוח שנה ויומן שיעורים</h2>
-                <button onClick={() => fetchSessions()} className="refresh-button">🔄 רענן</button>
+                <button onClick={() => fetchSessions()} className="refresh-button">
+                    <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
+                    <span>רענן</span>
+                </button>
             </div>
 
             <div className="calendar-legend">
@@ -239,7 +247,7 @@ export default function LessonList() {
                 headerToolbar={{
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
                 }}
                 buttonText={{
                     today: 'היום',
