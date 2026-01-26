@@ -214,9 +214,13 @@ function AppContent() {
             </div>
             <div className="header-left">
               <div className="user-profile">
-                <div className="user-avatar">{user?.email?.[0].toUpperCase()}</div>
+                <div className="user-avatar">
+                  {(user?.user_metadata?.full_name || user?.email)?.[0].toUpperCase()}
+                </div>
                 <div className="user-info">
-                  <span className="user-name">{user?.email?.split('@')[0]}</span>
+                  <span className="user-name">
+                    {user?.user_metadata?.full_name || user?.email?.split('@')[0]}
+                  </span>
                   <span className="user-role">מורה</span>
                 </div>
               </div>
