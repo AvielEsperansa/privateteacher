@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { GraduationCap, LogOut, Calendar, BookOpen, FileText, CheckCircle, Clock, ExternalLink, User, Lock, AlertCircle } from 'lucide-react';
+import StudentPractice from './StudentPractice';
 import '../styles/StudentArea.css';
 
 interface Session {
@@ -26,6 +27,7 @@ export default function StudentArea() {
     const [materials, setMaterials] = useState<Material[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showPractice, setShowPractice] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,6 +45,8 @@ export default function StudentArea() {
             if (sError || !s) throw new Error('שם המשתמש או הסיסמה אינם נכונים.');
 
             setStudent(s);
+            // שמירת נתוני התלמיד ב-sessionStorage עבור StudentPractice
+            sessionStorage.setItem('studentData', JSON.stringify(s));
 
             const { data: sess } = await supabase.from('sessions').select('*').eq('student_id', s.id).order('scheduled_at', { ascending: false });
             const { data: mats } = await supabase.from('materials').select('*').eq('student_id', s.id);
@@ -57,6 +61,10 @@ export default function StudentArea() {
     };
 
     if (student) {
+        if (showPractice) {
+            return <StudentPractice />;
+        }
+
         const upcoming = sessions.filter(s => s.status === 'scheduled');
         const history = sessions.filter(s => s.status === 'done');
         const generalMaterials = materials.filter(m => !m.session_id);
@@ -75,6 +83,19 @@ export default function StudentArea() {
 
                 <div className="student-layout">
                     <main>
+                        <section>
+                            <h3 className="portal-section-title">
+                                <BookOpen size={20} className="text-primary" />
+                                תרגול
+                            </h3>
+                            <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
+                                <p style={{ marginBottom: '1rem' }}>המורה יצר עבורך תרגול. לחץ על הכפתור כדי להתחיל!</p>
+                                <button onClick={() => setShowPractice(true)} className="btn btn-primary">
+                                    <BookOpen size={18} /> התחל תרגול
+                                </button>
+                            </div>
+                        </section>
+
                         <section>
                             <h3 className="portal-section-title">
                                 <Calendar size={20} className="text-primary" />

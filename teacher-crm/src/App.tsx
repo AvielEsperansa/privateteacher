@@ -9,7 +9,8 @@ import {
   Settings,
   LogOut,
   Menu,
-  GraduationCap
+  GraduationCap,
+  BookOpen
 } from 'lucide-react'
 import './styles/App.css'
 import AddStudent from './components/AddStudent'
@@ -20,10 +21,11 @@ import StudentArea from './components/StudentArea'
 import Wallet from './components/Wallet'
 import Auth from './components/Auth'
 import TeacherSettings from './components/TeacherSettings'
+import CreatePractice from './components/CreatePractice'
 import { supabase } from './lib/supabaseClient'
 
 function AppContent() {
-  const [activeTab, setActiveTab] = useState<'lessons' | 'schedule' | 'register' | 'wallet' | 'folders' | 'student' | 'settings'>('lessons');
+  const [activeTab, setActiveTab] = useState<'lessons' | 'schedule' | 'register' | 'wallet' | 'folders' | 'student' | 'settings' | 'practice'>('lessons');
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1024);
@@ -163,6 +165,7 @@ function AppContent() {
       { id: 'lessons', label: 'יומן שיעורים', icon: Calendar },
       { id: 'schedule', label: 'קביעת שיעור', icon: Calendar },
       { id: 'register', label: 'רישום תלמיד', icon: UserPlus },
+      { id: 'practice', label: 'ממשק תרגול', icon: BookOpen },
       { id: 'wallet', label: 'ארנק', icon: WalletIcon },
       { id: 'folders', label: 'תיקי תלמידים', icon: FolderOpen },
       { id: 'settings', label: 'הגדרות', icon: Settings },
@@ -248,6 +251,7 @@ function AppContent() {
                     <AddStudent />
                   </div>
                 )}
+                {activeTab === 'practice' && <CreatePractice />}
                 {activeTab === 'wallet' && <Wallet />}
                 {activeTab === 'folders' && <StudentList />}
                 {activeTab === 'settings' && <TeacherSettings />}

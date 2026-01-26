@@ -55,9 +55,13 @@ export interface Session {
 export interface Exercise {
     id: string;
     tenant_id: string;
+    student_id: string | null;
     subject: string | null;
     difficulty: number | null;
     question: string;
+    question_image_url: string | null;
+    question_type: 'multiple_choice' | 'open' | null;
+    options: string[] | string | null;
     correct_answer: string | null;
     explanation: string | null;
     created_by: string | null;

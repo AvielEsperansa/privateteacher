@@ -1,0 +1,241 @@
+.student-practice-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.practice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border);
+}
+
+.practice-header h2 {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.practice-score {
+    background: var(--primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-lg);
+    font-weight: 700;
+    font-size: 1.125rem;
+}
+
+.practice-loading,
+.practice-error,
+.practice-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    min-height: 400px;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.exercises-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.exercise-card {
+    background: var(--bg-surface);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--border);
+    transition: all 0.2s;
+}
+
+.exercise-card.correct {
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+
+.exercise-card.incorrect {
+    border-color: #ef4444;
+    background: #fff7ed;
+}
+
+.exercise-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.exercise-header h3 {
+    font-size: 1.25rem;
+    color: var(--text-main);
+}
+
+.result-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.result-badge.success {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.result-badge.error {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.question-image {
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.question-image img {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+}
+
+.question-text {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: var(--bg-main);
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--primary);
+}
+
+.question-text p {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.answer-section {
+    margin: 1.5rem 0;
+}
+
+.multiple-choice-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--bg-main);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.option-label:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.option-label input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.option-label.selected-correct {
+    border-color: #10b981;
+    background: #dcfce7;
+}
+
+.option-label.selected-incorrect {
+    border-color: #ef4444;
+    background: #fee2e2;
+}
+
+.option-label:has(input:disabled) {
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.open-answer {
+    width: 100%;
+    resize: vertical;
+}
+
+.result-details {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    border-left: 4px solid;
+}
+
+.result-details.success {
+    background: #f0fdf4;
+    border-color: #10b981;
+}
+
+.result-details.error {
+    background: #fff7ed;
+    border-color: #ef4444;
+}
+
+.result-info {
+    margin-bottom: 1rem;
+}
+
+.result-info p {
+    margin: 0.5rem 0;
+}
+
+.explanation {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.explanation strong {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.practice-actions {
+    display: flex;
+    justify-content: center;
+    padding: 2rem 0;
+    border-top: 2px solid var(--border);
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
