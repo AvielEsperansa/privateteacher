@@ -21,14 +21,14 @@ import StudentArea from './components/StudentArea'
 import Wallet from './components/Wallet'
 import Auth from './components/Auth'
 import TeacherSettings from './components/TeacherSettings'
-import CreatePractice from './components/CreatePractice'
+import ExerciseManager from './components/ExerciseManager'
 import { supabase } from './lib/supabaseClient'
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<'lessons' | 'schedule' | 'register' | 'wallet' | 'folders' | 'student' | 'settings' | 'practice'>('lessons');
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1024);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -43,9 +43,7 @@ function AppContent() {
     });
 
     const handleResize = () => {
-      if (window.innerWidth > 1024) {
-        setIsSidebarOpen(true);
-      } else {
+      if (window.innerWidth <= 1024) {
         setIsSidebarOpen(false);
       }
     };
@@ -165,7 +163,6 @@ function AppContent() {
       { id: 'lessons', label: 'יומן שיעורים', icon: Calendar },
       { id: 'schedule', label: 'קביעת שיעור', icon: Calendar },
       { id: 'register', label: 'רישום תלמיד', icon: UserPlus },
-      { id: 'practice', label: 'ממשק תרגול', icon: BookOpen },
       { id: 'wallet', label: 'ארנק', icon: WalletIcon },
       { id: 'folders', label: 'תיקי תלמידים', icon: FolderOpen },
       { id: 'settings', label: 'הגדרות', icon: Settings },
@@ -251,7 +248,6 @@ function AppContent() {
                     <AddStudent />
                   </div>
                 )}
-                {activeTab === 'practice' && <CreatePractice />}
                 {activeTab === 'wallet' && <Wallet />}
                 {activeTab === 'folders' && <StudentList />}
                 {activeTab === 'settings' && <TeacherSettings />}

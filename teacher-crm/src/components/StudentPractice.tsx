@@ -98,9 +98,11 @@ export default function StudentPractice() {
             supabase.from('exercise_attempts').insert({
                 exercise_id: exercise.id,
                 student_id: studentId,
-                answer: userAnswer,
+                student_answer: userAnswer,
                 is_correct: isCorrect,
                 time_spent_seconds: null
+            }).then(({ error }) => {
+                if (error) console.error('Error saving attempt in legacy component:', error);
             });
         });
 

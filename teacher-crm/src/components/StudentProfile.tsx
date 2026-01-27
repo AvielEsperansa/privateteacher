@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { X, Settings, Phone, GraduationCap, CheckCircle, Clock, MessageCircle, Save, Edit3, Shield } from 'lucide-react';
+import { X, Settings, Phone, GraduationCap, CheckCircle, XCircle, Clock, MessageCircle, Save, Edit3, Shield, BookOpen, Plus, Camera, Trash2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import ExerciseManager from './ExerciseManager';
 import '../styles/StudentProfile.css';
+import '../styles/ExerciseMini.css';
 
 interface Student {
     id: string;
@@ -35,7 +38,11 @@ interface Props {
 export default function StudentProfile({ studentId, onClose }: Props) {
     const [student, setStudent] = useState<Student | null>(null);
     const [sessions, setSessions] = useState<Session[]>([]);
-    const [activeTab, setActiveTab] = useState<'sessions' | 'notes'>('sessions');
+    const [exercises, setExercises] = useState<any[]>([]);
+    const [activeTab, setActiveTab] = useState<'sessions' | 'notes' | 'practice'>('sessions');
+    const [showAddExercise, setShowAddExercise] = useState(false);
+    const [pendingSessionId, setPendingSessionId] = useState<string | null>(null);
+    const [selectedExercise, setSelectedExercise] = useState<any | null>(null);
     const [newNote, setNewNote] = useState('');
     const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
     const [isEditingStudent, setIsEditingStudent] = useState(false);
@@ -63,6 +70,13 @@ export default function StudentProfile({ studentId, onClose }: Props) {
 
         const { data: h } = await supabase.from('sessions').select('*').eq('student_id', studentId).order('scheduled_at', { ascending: false });
         if (h) setSessions(h || []);
+
+        const { data: ex } = await supabase
+            .from('exercises')
+            .select('*, exercise_attempts(*), sessions(scheduled_at)')
+            .eq('student_id', studentId)
+            .order('created_at', { ascending: false });
+        if (ex) setExercises(ex || []);
     };
 
     const handleUpdateStudent = async (e: React.FormEvent) => {
@@ -241,6 +255,7 @@ export default function StudentProfile({ studentId, onClose }: Props) {
 
                             <div className="profile-tabs">
                                 <button className={`profile-tab-btn ${activeTab === 'sessions' ? 'active' : ''}`} onClick={() => setActiveTab('sessions')}>שיעורים וסיכומים</button>
+                                <button className={`profile-tab-btn ${activeTab === 'practice' ? 'active' : ''}`} onClick={() => setActiveTab('practice')}>תרגול אישי</button>
                                 <button className={`profile-tab-btn ${activeTab === 'notes' ? 'active' : ''}`} onClick={() => setActiveTab('notes')}>הערות למידה</button>
                             </div>
 
@@ -296,6 +311,18 @@ export default function StudentProfile({ studentId, onClose }: Props) {
                                                                     {s.is_paid ? <CheckCircle size={16} /> : <Clock size={16} />}
                                                                     <span>{s.is_paid ? 'שולם' : 'טרם שולם'}</span>
                                                                 </button>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setActiveTab('practice');
+                                                                        setShowAddExercise(true);
+                                                                        setPendingSessionId(s.id);
+                                                                    }}
+                                                                    className="btn btn-secondary"
+                                                                    style={{ color: 'var(--primary)', padding: '0.5rem' }}
+                                                                    title="שייך תרגיל לשיעור זה"
+                                                                >
+                                                                    <BookOpen size={18} />
+                                                                </button>
                                                                 <button onClick={() => {
                                                                     setEditingSessionId(s.id);
                                                                     setEditForm({
@@ -313,6 +340,79 @@ export default function StudentProfile({ studentId, onClose }: Props) {
                                                 </div>
                                             );
                                         })
+                                    )}
+                                </div>
+                            ) : activeTab === 'practice' ? (
+                                <div className="animate-fade-in">
+                                    <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', alignItems: 'center' }}>
+                                        <h3>תרגילים שניתנו לתלמיד</h3>
+                                        {!showAddExercise && (
+                                            <button onClick={() => setShowAddExercise(true)} className="btn btn-primary">
+                                                <Plus size={18} /> הוספת תרגול חדש
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    {showAddExercise ? (
+                                        <div className="add-exercise-inline">
+                                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+                                                <button onClick={() => setShowAddExercise(false)} className="btn btn-secondary">סגור</button>
+                                            </div>
+                                            <ExerciseManager
+                                                studentId={studentId}
+                                                sessionId={pendingSessionId || undefined}
+                                                onSave={() => {
+                                                    fetchProfileData();
+                                                    setTimeout(() => {
+                                                        setShowAddExercise(false);
+                                                        setPendingSessionId(null);
+                                                    }, 2000);
+                                                }}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="student-exercises-list">
+                                            {exercises.length === 0 ? (
+                                                <div style={{ textAlign: 'center', padding: '3rem', background: '#f8fafc', borderRadius: '16px' }}>
+                                                    <BookOpen size={40} className="text-muted" style={{ margin: '0 auto 1rem' }} />
+                                                    <p>טרם נשלחו תרגילים אישיים לתלמיד זה.</p>
+                                                    <button onClick={() => setShowAddExercise(true)} className="btn btn-secondary" style={{ marginTop: '1rem' }}>שלחי לו את התרגיל הראשון</button>
+                                                </div>
+                                            ) : (
+                                                <div className="exercise-mini-grid">
+                                                    {exercises.map(ex => (
+                                                        <div
+                                                            key={ex.id}
+                                                            className="exercise-mini-card"
+                                                            onClick={() => setSelectedExercise(ex)}
+                                                        >
+                                                            {ex.question_image_url ? (
+                                                                <div className="mini-image-wrap">
+                                                                    <img src={ex.question_image_url} alt="Question" />
+                                                                </div>
+                                                            ) : (
+                                                                <div className="mini-text-wrap">
+                                                                    <p>{ex.question?.substring(0, 60)}...</p>
+                                                                </div>
+                                                            )}
+                                                            <div className="mini-meta">
+                                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                                                                    <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{ex.topic}</span>
+                                                                    {ex.exercise_attempts && ex.exercise_attempts.length > 0 ? (
+                                                                        ex.exercise_attempts[0].is_correct ?
+                                                                            <CheckCircle size={14} className="text-success" /> :
+                                                                            <XCircle size={14} className="text-danger" />
+                                                                    ) : (
+                                                                        <Clock size={14} className="text-muted" />
+                                                                    )}
+                                                                </div>
+                                                                <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>{new Date(ex.created_at).toLocaleDateString('he-IL')}</span>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                             ) : (
@@ -335,6 +435,94 @@ export default function StudentProfile({ studentId, onClose }: Props) {
                     )}
                 </div>
             </div>
+
+            {/* חלון צפייה בתרגיל */}
+            <AnimatePresence>
+                {selectedExercise && (
+                    <motion.div
+                        className="exercise-view-overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setSelectedExercise(null)}
+                    >
+                        <motion.div
+                            className="exercise-view-card"
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <button className="close-view-btn" onClick={() => setSelectedExercise(null)}>
+                                <X size={24} />
+                            </button>
+
+                            <div className="view-content">
+                                <h3>תצוגת תרגיל</h3>
+                                <div className="view-question-area">
+                                    {selectedExercise.question_image_url ? (
+                                        <img src={selectedExercise.question_image_url} alt="שאלה" className="full-question-image" />
+                                    ) : (
+                                        <p className="full-question-text">{selectedExercise.question}</p>
+                                    )}
+                                </div>
+
+                                <div className="view-details-grid">
+                                    <div className="view-detail-item">
+                                        <label>תשובה סופית:</label>
+                                        <div className="detail-value highlight">{selectedExercise.correct_answer}</div>
+                                    </div>
+                                    {selectedExercise.sessions && (
+                                        <div className="view-detail-item">
+                                            <label>שויך לשיעור מתאריך:</label>
+                                            <div className="detail-value">
+                                                {new Date(selectedExercise.sessions.scheduled_at).toLocaleDateString('he-IL')}
+                                                ({new Date(selectedExercise.sessions.scheduled_at).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })})
+                                            </div>
+                                        </div>
+                                    )}
+                                    {selectedExercise.explanation && (
+                                        <div className="view-detail-item">
+                                            <label>הסבר/דגשים:</label>
+                                            <div className="detail-value">{selectedExercise.explanation}</div>
+                                        </div>
+                                    )}
+                                    {selectedExercise.exercise_attempts && selectedExercise.exercise_attempts.length > 0 && (
+                                        <div className="view-detail-item student-answer-box">
+                                            <label>תשובת התלמיד:</label>
+                                            <div className={`detail-value ${selectedExercise.exercise_attempts[0].is_correct ? 'correct-bg' : 'incorrect-bg'}`}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <span>{selectedExercise.exercise_attempts[0].student_answer}</span>
+                                                    {selectedExercise.exercise_attempts[0].is_correct ?
+                                                        <span className="status-pill correct">נכון ✅</span> :
+                                                        <span className="status-pill incorrect">צריך חיזוק ❌</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="view-footer">
+                                    <button
+                                        className="btn btn-secondary"
+                                        style={{ color: 'var(--danger)', borderColor: 'var(--danger)' }}
+                                        onClick={async () => {
+                                            if (window.confirm('האם את בטוחה שברצונך למחוק תרגיל זה?')) {
+                                                await supabase.from('exercises').delete().eq('id', selectedExercise.id);
+                                                setSelectedExercise(null);
+                                                fetchProfileData();
+                                            }
+                                        }}
+                                    >
+                                        <Trash2 size={16} /> מחיקת תרגיל
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
