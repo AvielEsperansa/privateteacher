@@ -6,6 +6,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
+import type { EventClickArg, EventDropArg, EventChangeArg } from '@fullcalendar/core';
 import '../styles/LessonList.css';
 import StudentProfile from './StudentProfile';
 
@@ -52,9 +53,24 @@ export default function LessonList() {
                 .eq('teacher_id', user.id);
 
             if (error) throw error;
-            setSessions(data as any || []);
-        } catch (error: any) {
-            console.error('Error fetching sessions:', error.message);
+            // Supabase returns students as an array for joins, but we expect a single object
+            const typedData = (data || []).map((item: {
+                id: string;
+                scheduled_at: string;
+                duration_minutes: number;
+                status: 'scheduled' | 'done' | 'canceled';
+                summary: string;
+                homework: string;
+                is_paid: boolean;
+                student_id: string;
+                students: { full_name: string; phone_number: string; subject: string; } | { full_name: string; phone_number: string; subject: string; }[];
+            }): Session => ({
+                ...item,
+                students: Array.isArray(item.students) ? item.students[0] : item.students
+            })) as Session[];
+            setSessions(typedData);
+        } catch (error: unknown) {
+            console.error('Error fetching sessions:', error instanceof Error ? error.message : String(error));
         } finally {
             if (!silent) setLoading(false);
         }
@@ -111,14 +127,18 @@ export default function LessonList() {
         };
     });
 
-    const handleEventClick = (info: any) => {
+    const handleEventClick = (info: EventClickArg) => {
         setSelectedStudentId(info.event.extendedProps.student_id);
     };
 
     // Handle dragging event to new time
-    const handleEventDrop = async (info: any) => {
+    const handleEventDrop = async (info: EventDropArg) => {
         const sessionId = info.event.id;
         const newStart = info.event.start;
+        if (!newStart) {
+            info.revert();
+            return;
+        }
         const duration = info.event.extendedProps.duration_minutes || 60;
         const newEnd = new Date(newStart.getTime() + duration * 60000);
 
@@ -161,10 +181,14 @@ export default function LessonList() {
     };
 
     // Handle resizing event (changing duration)
-    const handleEventResize = async (info: any) => {
+    const handleEventResize = async (info: EventChangeArg) => {
         const sessionId = info.event.id;
         const newStart = info.event.start;
         const newEnd = info.event.end;
+        if (!newStart || !newEnd) {
+            info.revert();
+            return;
+        }
         const newDuration = Math.round((newEnd.getTime() - newStart.getTime()) / 60000);
 
         try {

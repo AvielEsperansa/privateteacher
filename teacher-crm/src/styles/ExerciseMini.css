@@ -1,0 +1,233 @@
+.exercise-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.exercise-mini-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.exercise-mini-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.mini-image-wrap {
+    height: 100px;
+}
+
+.mini-image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.mini-text-wrap {
+    padding: 0.75rem;
+    height: 100px;
+    font-size: 0.8rem;
+    color: #475569;
+    background: #f8fafc;
+    overflow: hidden;
+}
+
+.mini-meta {
+    padding: 0.5rem 0.75rem;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+}
+
+.add-exercise-inline {
+    background: #f1f5f9;
+    padding: 1.5rem;
+    border-radius: 16px;
+    border: 1px dashed #cbd5e1;
+}
+
+.student-profile-card {
+    max-width: 900px !important;
+}
+
+/* detailed view modal - Compact Version */
+.exercise-view-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 1rem;
+}
+
+.exercise-view-card {
+    background: white;
+    width: 100%;
+    max-width: 400px;
+    max-height: 85vh;
+    border-radius: 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+}
+
+@keyframes modalPop {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.close-view-btn {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.2s;
+    color: #ef4444;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.view-content {
+    padding: 1rem;
+}
+
+.view-content h3 {
+    font-size: 1.1rem;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 0.4rem;
+    text-align: center;
+}
+
+.view-question-area {
+    margin-bottom: 0.75rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 0.5rem;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: center;
+}
+
+.full-question-image {
+    width: 100%;
+    max-height: 180px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.full-question-text {
+    font-size: 1.1rem;
+    line-height: 1.4;
+    color: #1e293b;
+    text-align: center;
+    padding: 0.5rem;
+    font-weight: 600;
+}
+
+.view-details-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    text-align: right;
+}
+
+.view-detail-item label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 0.2rem;
+}
+
+.detail-value {
+    font-size: 0.9rem;
+    color: #1e293b;
+    background: #f8fafc;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    line-height: 1.3;
+}
+
+.detail-value.highlight {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #dbeafe;
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.view-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+.student-answer-box {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed #e2e8f0;
+}
+
+.correct-bg {
+    background: #ecfdf5 !important;
+    border: 1px solid #10b981;
+    color: #065f46 !important;
+}
+
+.incorrect-bg {
+    background: #fef2f2 !important;
+    border: 1px solid #ef4444;
+    color: #991b1b !important;
+}
+
+.status-pill {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.status-pill.correct {
+    background: #10b981;
+    color: white;
+}
+
+.status-pill.incorrect {
+    background: #ef4444;
+    color: white;
+}

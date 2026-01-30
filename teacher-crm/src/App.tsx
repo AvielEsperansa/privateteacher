@@ -9,7 +9,8 @@ import {
   Settings,
   LogOut,
   Menu,
-  GraduationCap
+  GraduationCap,
+  BookOpen
 } from 'lucide-react'
 import './styles/App.css'
 import AddStudent from './components/AddStudent'
@@ -20,13 +21,14 @@ import StudentArea from './components/StudentArea'
 import Wallet from './components/Wallet'
 import Auth from './components/Auth'
 import TeacherSettings from './components/TeacherSettings'
+import ExerciseManager from './components/ExerciseManager'
 import { supabase } from './lib/supabaseClient'
 
 function AppContent() {
-  const [activeTab, setActiveTab] = useState<'lessons' | 'schedule' | 'register' | 'wallet' | 'folders' | 'student' | 'settings'>('lessons');
+  const [activeTab, setActiveTab] = useState<'lessons' | 'schedule' | 'register' | 'wallet' | 'folders' | 'student' | 'settings' | 'practice'>('lessons');
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1024);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -41,9 +43,7 @@ function AppContent() {
     });
 
     const handleResize = () => {
-      if (window.innerWidth > 1024) {
-        setIsSidebarOpen(true);
-      } else {
+      if (window.innerWidth <= 1024) {
         setIsSidebarOpen(false);
       }
     };
@@ -214,9 +214,13 @@ function AppContent() {
             </div>
             <div className="header-left">
               <div className="user-profile">
-                <div className="user-avatar">{user?.email?.[0].toUpperCase()}</div>
+                <div className="user-avatar">
+                  {(user?.user_metadata?.full_name || user?.email)?.[0].toUpperCase()}
+                </div>
                 <div className="user-info">
-                  <span className="user-name">{user?.email?.split('@')[0]}</span>
+                  <span className="user-name">
+                    {user?.user_metadata?.full_name || user?.email?.split('@')[0]}
+                  </span>
                   <span className="user-role">מורה</span>
                 </div>
               </div>
